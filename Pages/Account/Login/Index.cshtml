@@ -1,8 +1,5 @@
 @page
-@model identity_template_example.Pages.Login.Index
-
-
-<partial name="_ValidationSummary"/>
+@model identity_template_example.Pages.Account.Login.Index
 
 @if (Model.View.EnableLocalLogin)
 {
@@ -16,57 +13,54 @@
             <form class="mt-8" asp-page="/Account/Login/Index">
                 <div class="space-y-3">
                     <input type="hidden" asp-for="Input.ReturnUrl"/>
-                    <div class="rounded-md shadow-sm space-y-3">
-                        <div class="space-y-1">
-                            <label class="text-sm text-gray-800" asp-for="Input.Username">Username</label>
-                            <input
-                                asp-for="Input.Username"
-                                autofocus
-                                required
-                                placeholder="Username"
-                                class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-violet-500 focus:border-violet-500 focus:z-10 sm:text-sm"/>
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-sm text-gray-800" asp-for="Input.Username">Password</label>
-                            <input
-                                asp-for="Input.Password"
-                                type="password"
-                                autocomplete="current-password"
-                                required
-                                placeholder="Password"
-                                class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-violet-500 focus:border-violet-500 focus:z-10 sm:text-sm"/>
-                        </div>
+                    <div class="space-y-0.5">
+                        <label class="text-sm text-gray-800" asp-for="Input.Username">Username</label>
+                        <input
+                            asp-for="Input.Username"
+                            autofocus
+                            required
+                            placeholder="Username"
+                            class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-violet-500 focus:border-violet-500 focus:z-10 sm:text-sm"
+                        />
+                        <span asp-validation-for="Input.Username" class="text-danger"></span>
+                    </div>
+                    <div class="space-y-0.5">
+                        <label class="text-sm text-gray-800" asp-for="Input.Password">Password</label>
+                        <input
+                            asp-for="Input.Password"
+                            type="password"
+                            autocomplete="current-password"
+                            required
+                            placeholder="Password"
+                            class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-violet-500 focus:border-violet-500 focus:z-10 sm:text-sm"
+                        />
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
                     </div>
                 </div>
 
-                <div class="pt-3 flex items-center justify-between">
-                    @if (Model.View.AllowRememberLogin)
-                    {
-                        <div class="flex items-center">
-                            <input asp-for="Input.RememberLogin" id="RememberLogin" name="RememberLogin" type="checkbox" class="h-4 w-4 text-violet-600 focus:ring-violet-500 border-gray-300 rounded"/>
-                            <label asp-for="Input.RememberLogin" class="ml-2 block text-sm text-gray-900"> Remember me </label>
-                        </div>
-                    }
-
-                    <!-- <div class="text-sm">
-                        <a href="#" class="font-medium text-violet-600 hover:text-violet-500">
-                            Forgot your password?
-                        </a>
-                    </div> -->
-                </div>
+                @* <div class="pt-3 flex items-center justify-between"> *@
+                @*     @if (Model.View.AllowRememberLogin) *@
+                @*     { *@
+                @*         <div class="flex items-center"> *@
+                @*             <input asp-for="Input.RememberLogin" id="RememberLogin" name="RememberLogin" type="checkbox" class="h-4 w-4 text-violet-600 focus:ring-violet-500 border-gray-300 rounded"/> *@
+                @*             <label asp-for="Input.RememberLogin" class="ml-2 block text-sm text-gray-900"> Remember me </label> *@
+                @*         </div> *@
+                @*     } *@
+                @* </div> *@
 
                 <div class="pt-6">
                     <button
                         name="Input.button"
                         type="submit"
                         value="login"
-                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500">
+                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
+                    >
                         Sign in
                     </button>
                 </div>
             </form>
         </div>
-        <div class="rounded-lg bg-gray-100 shadow-md border border-gray-300 px-5 py-4 max-w-lg">
+        <div class="rounded-lg bg-gray-100 shadow-md border border-gray-300 p-4 max-w-md">
             <div class="flex items-center justify-start text-gray-800">
                 <div class="">
                     <svg class="h-6 w-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -74,7 +68,7 @@
                         <path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM256 128c17.67 0 32 14.33 32 32c0 17.67-14.33 32-32 32S224 177.7 224 160C224 142.3 238.3 128 256 128zM296 384h-80C202.8 384 192 373.3 192 360s10.75-24 24-24h16v-64H224c-13.25 0-24-10.75-24-24S210.8 224 224 224h32c13.25 0 24 10.75 24 24v88h16c13.25 0 24 10.75 24 24S309.3 384 296 384z"/>
                     </svg>
                 </div>
-                <div class="px-5 text-sm">
+                <div class="pl-4 text-sm">
                     <ul class="space-y-4 sm:space-y-1">
                         <li class="">User <span class="text-blue-400 font-medium">alice</span> with password <span class="text-blue-400 font-medium">alice</span> has a Super User role.</li>
                         <li class="">User <span class="text-blue-400 font-medium">bob</span> with password <span class="text-blue-400 font-medium">bob</span> has a User role.</li>

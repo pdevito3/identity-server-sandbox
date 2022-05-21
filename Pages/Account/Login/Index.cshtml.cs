@@ -1,18 +1,16 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+namespace identity_template_example.Pages.Account.Login;
+
+using Pages.Login;
 using Duende.IdentityServer.Events;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Stores;
-using identity_template_example.Models;
+using Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-
-namespace identity_template_example.Pages.Login;
 
 [SecurityHeaders]
 [AllowAnonymous]
