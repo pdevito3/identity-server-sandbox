@@ -1,6 +1,7 @@
 namespace identity_template_example;
 
 using Duende.IdentityServer;
+using Duende.IdentityServer.EntityFramework.DbContexts;
 using identity_template_example.Data;
 using identity_template_example.Models;
 using is_with_ef.Pages.Admin.ApiScopes;
@@ -18,29 +19,14 @@ internal static class HostingExtensions
     {
         builder.Services.AddRazorPages();
         
-        // DbContext -- Do Not Delete
-        // if (env.IsEnvironment(LocalConfig.FunctionalTestingEnvName))
-        // {
-        //     services.AddDbContext<RecipesDbContext>(options =>
-        //         options.UseInMemoryDatabase($"RecipeManagement"));
-        // }
-        // else
-        // {
-        var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-        if(string.IsNullOrEmpty(connectionString))
-        {
-            // this makes local migrations easier to manage. feel free to refactor if desired.
-            connectionString = builder.Environment.IsDevelopment() 
-                ? "Host=localhost;Port=33674;Database=dev_recipemanagement;Username=postgres;Password=postgres"
-                : throw new Exception("DB_CONNECTION_STRING environment variable is not set.");
-        }
-
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(connectionString,
+        {
+            var identityConnectionString = GetIdentityConnectionString(builder);
+            options.UseNpgsql(identityConnectionString,
                     b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName))
-                .UseSnakeCaseNamingConvention());
-        // }
-
+                .UseSnakeCaseNamingConvention();
+        });
+        
         builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
@@ -56,9 +42,30 @@ internal static class HostingExtensions
                 // see https://docs.duendesoftware.com/identityserver/v6/fundamentals/resources/
                 options.EmitStaticAudienceClaim = true;
             })
-            .AddInMemoryIdentityResources(Config.IdentityResources)
-            .AddInMemoryApiScopes(Config.ApiScopes)
-            .AddInMemoryClients(Config.Clients)
+            // this adds the config data from DB (clients, resources, CORS)
+            .AddConfigurationStore(options =>
+            {
+                var configConnectionString = GetConfigConnectionString(builder);
+                options.ConfigureDbContext = configBuilder =>
+                    configBuilder.UseNpgsql(configConnectionString,
+                    configOptions => configOptions.MigrationsAssembly(typeof(ConfigurationDbContext).Assembly.FullName))
+                .UseSnakeCaseNamingConvention();
+            })
+            // caching reduces load on and requests to the DB
+            .AddConfigurationStoreCache()
+            // this adds the operational data from DB (codes, tokens, consents)
+            .AddOperationalStore(options =>
+            {
+                var grantsConnectionString = GetGrantsConnectionString(builder);
+                options.ConfigureDbContext = grantsBuilder =>
+                    grantsBuilder.UseNpgsql(grantsConnectionString,
+                            grantsOptions => grantsOptions.MigrationsAssembly(typeof(PersistedGrantDbContext).Assembly.FullName))
+                        .UseSnakeCaseNamingConvention();
+
+                // this enables automatic token cleanup. this is optional.
+                options.EnableTokenCleanup = true;
+                options.RemoveConsumedTokens = true;
+            })
             .AddAspNetIdentity<ApplicationUser>();
         
         builder.Services.AddAuthentication()
@@ -88,7 +95,49 @@ internal static class HostingExtensions
         
         return builder.Build();
     }
-    
+
+    private static string GetIdentityConnectionString(WebApplicationBuilder builder)
+    {
+        var identityConnectionString = Environment.GetEnvironmentVariable("IDENTITY_DB_CONNECTION_STRING");
+        if (string.IsNullOrEmpty(identityConnectionString))
+        {
+            // this makes local migrations easier to manage. feel free to refactor if desired.
+            identityConnectionString = builder.Environment.IsDevelopment()
+                ? "Host=localhost;Port=33674;Database=auth-identity-db;Username=postgres;Password=postgres"
+                : throw new Exception("IDENTITY_DB_CONNECTION_STRING environment variable is not set.");
+        }
+
+        return identityConnectionString;
+    }
+
+    private static string GetConfigConnectionString(WebApplicationBuilder builder)
+    {
+        var configConnectionString = Environment.GetEnvironmentVariable("CONFIG_DB_CONNECTION_STRING");
+        if (string.IsNullOrEmpty(configConnectionString))
+        {
+            // this makes local migrations easier to manage. feel free to refactor if desired.
+            configConnectionString = builder.Environment.IsDevelopment()
+                ? "Host=localhost;Port=33674;Database=auth-config-db;Username=postgres;Password=postgres"
+                : throw new Exception("CONFIG_DB_CONNECTION_STRING environment variable is not set.");
+        }
+
+        return configConnectionString;
+    }
+
+    private static string GetGrantsConnectionString(WebApplicationBuilder builder)
+    {
+        var grantsConnectionString = Environment.GetEnvironmentVariable("GRANTS_DB_CONNECTION_STRING");
+        if (string.IsNullOrEmpty(grantsConnectionString))
+        {
+            // this makes local migrations easier to manage. feel free to refactor if desired.
+            grantsConnectionString = builder.Environment.IsDevelopment()
+                ? "Host=localhost;Port=33674;Database=auth-grants-db;Username=postgres;Password=postgres"
+                : throw new Exception("GRANTS_DB_CONNECTION_STRING environment variable is not set.");
+        }
+
+        return grantsConnectionString;
+    }
+
     public static WebApplication ConfigurePipeline(this WebApplication app)
     { 
         app.UseSerilogRequestLogging();

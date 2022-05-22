@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
-  myauthserver-db:
+  auth-identity-db:
     image: postgres
     restart: always
     ports:
@@ -9,9 +9,35 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: dev_myauthserver
+      POSTGRES_DB: dev_auth-identity
     volumes:
-      - myauthserver-data:/var/lib/postgresql/data
-        
+      - auth-identity-data:/var/lib/postgresql/data
+
+  auth-config-db:
+    image: postgres
+    restart: always
+    ports:
+      - '33675:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth-dev_config
+    volumes:
+      - auth-config-data:/var/lib/postgresql/data
+
+  auth-grants-db:
+    image: postgres
+    restart: always
+    ports:
+      - '33676:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      auth-POSTGRES_DB: dev_grants
+    volumes:
+      - auth-grants-data:/var/lib/postgresql/data
+
 volumes:
-  myauthserver-data:
+  auth-identity-data:
+  auth-config-data:
+  auth-grants-data:
