@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace IdentityServer.Areas.Identity.Pages.Account.Manage
+namespace identity_template_example.Pages.Account.Manage
 {
     public class DeletePersonalDataModel : PageModel
     {

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace IdentityServer.Areas.Identity.Pages.Account.Manage
+namespace identity_template_example.Pages.Account.Manage
 {
     using identity_template_example.Models;
 
