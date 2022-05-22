@@ -3,7 +3,11 @@ namespace identity_template_example;
 using Duende.IdentityServer;
 using identity_template_example.Data;
 using identity_template_example.Models;
+using is_with_ef.Pages.Admin.ApiScopes;
+using is_with_ef.Pages.Admin.Clients;
+using is_with_ef.Pages.Admin.IdentityScopes;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -69,6 +73,19 @@ internal static class HostingExtensions
                 options.ClientSecret = "copy client secret from Google here";
             });
 
+        // TODO update with heimguard
+        builder.Services.AddAuthorization(options =>
+            options.AddPolicy("admin",
+                policy => policy.RequireClaim("sub", "1"))
+        );
+        
+        builder.Services.Configure<RazorPagesOptions>(options =>
+            options.Conventions.AuthorizeFolder("/Admin", "admin"));
+
+        builder.Services.AddTransient<ClientRepository>();
+        builder.Services.AddTransient<IdentityScopeRepository>();
+        builder.Services.AddTransient<ApiScopeRepository>();
+        
         return builder.Build();
     }
     
