@@ -38,15 +38,15 @@
                     </div>
                 </div>
 
-                @* <div class="pt-3 flex items-center justify-between"> *@
-                @*     @if (Model.View.AllowRememberLogin) *@
-                @*     { *@
-                @*         <div class="flex items-center"> *@
-                @*             <input asp-for="Input.RememberLogin" id="RememberLogin" name="RememberLogin" type="checkbox" class="h-4 w-4 text-violet-600 focus:ring-violet-500 border-gray-300 rounded"/> *@
-                @*             <label asp-for="Input.RememberLogin" class="ml-2 block text-sm text-gray-900"> Remember me </label> *@
-                @*         </div> *@
-                @*     } *@
-                @* </div> *@
+                <div class="pt-3 flex items-center justify-between">
+                    @if (Model.View.AllowRememberLogin)
+                    {
+                        <div class="flex items-center">
+                            <input asp-for="Input.RememberMe" id="RememberLogin" name="RememberLogin" type="checkbox" class="h-4 w-4 text-violet-600 focus:ring-violet-500 border-gray-300 rounded"/>
+                            <label asp-for="Input.RememberMe" class="ml-2 block text-sm text-gray-900"> Remember me </label>
+                        </div>
+                    }
+                </div>
 
                 <div class="pt-6">
                     <button

@@ -23,11 +23,13 @@ public class Index : PageModel
     private readonly IEventService _events;
     private readonly IAuthenticationSchemeProvider _schemeProvider;
     private readonly IIdentityProviderStore _identityProviderStore;
+    private readonly ILogger<Index> _logger;
 
     public ViewModel View { get; set; }
         
     [BindProperty]
     public InputModel Input { get; set; }
+    public IList<AuthenticationScheme> ExternalLogins { get; set; }
         
     public Index(
         IIdentityServerInteractionService interaction,
@@ -35,6 +37,7 @@ public class Index : PageModel
         IAuthenticationSchemeProvider schemeProvider,
         IIdentityProviderStore identityProviderStore,
         IEventService events,
+        ILogger<Index> logger,
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager)
     {
@@ -45,11 +48,13 @@ public class Index : PageModel
         _schemeProvider = schemeProvider;
         _identityProviderStore = identityProviderStore;
         _events = events;
+        _logger = logger;
     }
         
     public async Task<IActionResult> OnGet(string returnUrl)
     {
         await BuildModelAsync(returnUrl);
+        ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             
         if (View.IsExternalLoginOnly)
         {
@@ -64,35 +69,13 @@ public class Index : PageModel
     {
         // check if we are in the context of an authorization request
         var context = await _interaction.GetAuthorizationContextAsync(Input.ReturnUrl);
-
-        // the user clicked the "cancel" button
-        if (Input.Button != "login")
-        {
-            if (context != null)
-            {
-                // if the user cancels, send a result back into IdentityServer as if they 
-                // denied the consent (even if this client does not require consent).
-                // this will send back an access denied OIDC error response to the client.
-                await _interaction.DenyAuthorizationAsync(context, AuthorizationError.AccessDenied);
-
-                // we can trust model.ReturnUrl since GetAuthorizationContextAsync returned non-null
-                if (context.IsNativeClient())
-                {
-                    // The client is native, so this change in how to
-                    // return the response is for better UX for the end user.
-                    return this.LoadingPage(Input.ReturnUrl);
-                }
-
-                return Redirect(Input.ReturnUrl);
-            }
-
-            // since we don't have a valid context, then we just go back to the home page
-            return Redirect("~/");
-        }
-
+        ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+        
         if (ModelState.IsValid)
         {
-            var result = await _signInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberLogin, lockoutOnFailure: true);
+            // This doesn't count login failures towards account lockout
+            // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+            var result = await _signInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberMe, lockoutOnFailure: false);
             if (result.Succeeded)
             {
                 var user = await _userManager.FindByNameAsync(Input.Username);
@@ -113,23 +96,30 @@ public class Index : PageModel
 
                 // request for a local page
                 if (Url.IsLocalUrl(Input.ReturnUrl))
-                {
                     return Redirect(Input.ReturnUrl);
-                }
 
                 if (string.IsNullOrEmpty(Input.ReturnUrl))
-                {
                     return Redirect("~/");
-                }
 
                 // user might have clicked on a malicious link - should be logged
                 throw new Exception("invalid return URL");
             }
-
+            if (result.RequiresTwoFactor)
+            {
+                // TODO add FIDO option https://github.com/damienbod/IdentityServer4AspNetCoreIdentityTemplate/blob/1ad5445e112e9042eba5f0cbb3c747d25d8ed5bc/content/StsServerIdentity/Controllers/AccountController.cs#L117
+                return RedirectToPage("./LoginWith2fa", new { ReturnUrl = Input.ReturnUrl, RememberMe = Input.RememberMe });
+            }
+            if (result.IsLockedOut)
+            {
+                _logger.LogWarning("User account locked out.");
+                return RedirectToPage("./Lockout");
+            }
+            
             await _events.RaiseAsync(new UserLoginFailureEvent(Input.Username, "invalid credentials", clientId:context?.Client.ClientId));
             ModelState.AddModelError(string.Empty, LoginOptions.InvalidCredentialsErrorMessage);
+            return Page();
         }
-
+        
         // something went wrong, show form with error
         await BuildModelAsync(Input.ReturnUrl);
         return Page();
