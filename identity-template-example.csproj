@@ -18,9 +18,23 @@
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0" />
   </ItemGroup>
 
-  <Target Name="Tailwind" BeforeTargets="Build">
-    <Exec Command="npm install" />
-    <Exec Command="npm run css:build" />
-  </Target>
+    <Target Name="CheckForNpm" BeforeTargets="BuildCSS">
+        <Exec Command="npm -v" ContinueOnError="true">
+            <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+        </Exec>
+        <Error Condition="'$(ErrorCode)' != '0'" Text="You must install NPM to build this project" />
+    </Target>
+    
+    <Target Name="Npm" BeforeTargets="Build">
+        <Exec Command="npm install" />
+    </Target>
+    
+    <Target Name="BuildCSS" BeforeTargets="Compile">
+        <Exec Command="npx tailwindcss -i Styles/app.css -o wwwroot/css/app.css --minify" Condition=" '$(Configuration)' != 'Development' " />
+    </Target>
+
+    <Target Name="BuildCSS" BeforeTargets="Compile">
+        <Exec EnvironmentVariables="NODE_ENV=development" Command="npx tailwindcss -i Styles/app.css -o wwwroot/css/app.css --watch" Condition=" '$(Configuration)' == 'Development' " />
+    </Target>
 
 </Project>

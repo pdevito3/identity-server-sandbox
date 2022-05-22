@@ -1,13 +1,12 @@
 {
   "dependencies": {},
-  "scripts": {
-    "css:build": "npx tailwind build ./wwwroot/css/site.css -o ./wwwroot/css/output.css"
-  },
+  "scripts": {},
   "devDependencies": {
-    "autoprefixer": "^10.3.4",
-    "postcss": "^8.3.6",
-    "@tailwindcss/forms": "^0.3.4",
-    "tailwindcss": "^2.2.16"
+    "cross-env": "^7.0.3",
+    "tailwindcss": "^3.0.18",
+    "postcss": "^8.4.6",
+    "autoprefixer": "^10.4.2",
+    "@tailwindcss/forms": "^0.3.4"
   },
   "author": "Built with Craftsman - https://github.com/pdevito3/craftsman"
 }
