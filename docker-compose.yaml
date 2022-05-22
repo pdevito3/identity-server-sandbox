@@ -1,0 +1,17 @@
+version: '3.7'
+
+services:
+  myauthserver-db:
+    image: postgres
+    restart: always
+    ports:
+      - '33674:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dev_myauthserver
+    volumes:
+      - myauthserver-data:/var/lib/postgresql/data
+        
+volumes:
+  myauthserver-data:

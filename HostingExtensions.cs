@@ -1,3 +1,5 @@
+namespace identity_template_example;
+
 using Duende.IdentityServer;
 using identity_template_example.Data;
 using identity_template_example.Models;
@@ -5,16 +7,35 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
-namespace identity_template_example;
 
 internal static class HostingExtensions
 {
     public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddRazorPages();
+        
+        // DbContext -- Do Not Delete
+        // if (env.IsEnvironment(LocalConfig.FunctionalTestingEnvName))
+        // {
+        //     services.AddDbContext<RecipesDbContext>(options =>
+        //         options.UseInMemoryDatabase($"RecipeManagement"));
+        // }
+        // else
+        // {
+        var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+        if(string.IsNullOrEmpty(connectionString))
+        {
+            // this makes local migrations easier to manage. feel free to refactor if desired.
+            connectionString = builder.Environment.IsDevelopment() 
+                ? "Host=localhost;Port=33674;Database=dev_recipemanagement;Username=postgres;Password=postgres"
+                : throw new Exception("DB_CONNECTION_STRING environment variable is not set.");
+        }
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(connectionString,
+                    b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName))
+                .UseSnakeCaseNamingConvention());
+        // }
 
         builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
