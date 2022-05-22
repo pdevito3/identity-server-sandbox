@@ -8,6 +8,30 @@
         "DB_CONNECTION_STRING": "Host=localhost;Port=33674;Database=dev_recipemanagement;Username=postgres;Password=postgres"
       },
       "applicationUrl": "https://localhost:3385"
+    },
+    "mac-watch": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "workingDirectory": "$(ProjectDir)",
+      "commandLineArgs": "watch run",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DB_CONNECTION_STRING": "Host=localhost;Port=33674;Database=dev_recipemanagement;Username=postgres;Password=postgres"
+      },
+      "applicationUrl": "https://localhost:3385"
+    },
+    "windows-watch": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Program Files\\dotnet\\dotnet.exe",
+      "workingDirectory": "$(ProjectDir)",
+      "commandLineArgs": "watch run",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DB_CONNECTION_STRING": "Host=localhost;Port=33674;Database=dev_recipemanagement;Username=postgres;Password=postgres"
+      },
+      "applicationUrl": "https://localhost:3385"
     }
   }
 }
