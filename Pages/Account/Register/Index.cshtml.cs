@@ -78,8 +78,8 @@ public class Index : PageModel
             IdentityResult claimResult = null;
             if (result.Succeeded)
             {
-                claimResult = await _userManager.AddClaimAsync(user, new Claim(JwtClaimTypes.Role, role));
-                
+                claimResult = await _userManager.AddToRoleAsync(user, role);
+
                 if (claimResult != null && claimResult.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
