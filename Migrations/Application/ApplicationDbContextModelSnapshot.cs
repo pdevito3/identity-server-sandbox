@@ -8,7 +8,7 @@ using identity_template_example.Data;
 
 #nullable disable
 
-namespace identitytemplateexample.Migrations
+namespace identitytemplateexample.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot

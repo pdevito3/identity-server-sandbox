@@ -48,7 +48,7 @@ internal static class HostingExtensions
                 var configConnectionString = GetConfigConnectionString(builder);
                 options.ConfigureDbContext = configBuilder =>
                     configBuilder.UseNpgsql(configConnectionString,
-                    configOptions => configOptions.MigrationsAssembly(typeof(ConfigurationDbContext).Assembly.FullName))
+                    configOptions => configOptions.MigrationsAssembly(typeof(Program).Assembly.FullName))
                 .UseSnakeCaseNamingConvention();
             })
             // caching reduces load on and requests to the DB
@@ -56,10 +56,10 @@ internal static class HostingExtensions
             // this adds the operational data from DB (codes, tokens, consents)
             .AddOperationalStore(options =>
             {
-                var grantsConnectionString = GetGrantsConnectionString(builder);
-                options.ConfigureDbContext = grantsBuilder =>
-                    grantsBuilder.UseNpgsql(grantsConnectionString,
-                            grantsOptions => grantsOptions.MigrationsAssembly(typeof(PersistedGrantDbContext).Assembly.FullName))
+                var persistedGrantsConnectionString = GetOpsConnectionString(builder);
+                options.ConfigureDbContext = persistedGrantsBuilder =>
+                    persistedGrantsBuilder.UseNpgsql(persistedGrantsConnectionString,
+                            persistedGrantsOptions => persistedGrantsOptions.MigrationsAssembly(typeof(Program).Assembly.FullName))
                         .UseSnakeCaseNamingConvention();
 
                 // this enables automatic token cleanup. this is optional.
@@ -124,18 +124,18 @@ internal static class HostingExtensions
         return configConnectionString;
     }
 
-    private static string GetGrantsConnectionString(WebApplicationBuilder builder)
+    private static string GetOpsConnectionString(WebApplicationBuilder builder)
     {
-        var grantsConnectionString = Environment.GetEnvironmentVariable("GRANTS_DB_CONNECTION_STRING");
-        if (string.IsNullOrEmpty(grantsConnectionString))
+        var persistedGrantsConnectionString = Environment.GetEnvironmentVariable("OPS_DB_CONNECTION_STRING");
+        if (string.IsNullOrEmpty(persistedGrantsConnectionString))
         {
             // this makes local migrations easier to manage. feel free to refactor if desired.
-            grantsConnectionString = builder.Environment.IsDevelopment()
-                ? "Host=localhost;Port=33674;Database=auth-grants-db;Username=postgres;Password=postgres"
-                : throw new Exception("GRANTS_DB_CONNECTION_STRING environment variable is not set.");
+            persistedGrantsConnectionString = builder.Environment.IsDevelopment()
+                ? "Host=localhost;Port=33674;Database=auth-ops-db;Username=postgres;Password=postgres"
+                : throw new Exception("OPS_DB_CONNECTION_STRING environment variable is not set.");
         }
 
-        return grantsConnectionString;
+        return persistedGrantsConnectionString;
     }
 
     public static WebApplication ConfigurePipeline(this WebApplication app)

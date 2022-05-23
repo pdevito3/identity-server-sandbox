@@ -4,9 +4,9 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace identitytemplateexample.Migrations
+namespace identitytemplateexample.Migrations.Application
 {
-    public partial class initialMigrationForDockerBase : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

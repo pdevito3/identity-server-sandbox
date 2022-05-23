@@ -25,7 +25,7 @@ services:
     volumes:
       - auth-config-data:/var/lib/postgresql/data
 
-  auth-grants-db:
+  auth-ops-db:
     image: postgres
     restart: always
     ports:
@@ -33,11 +33,11 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      auth-POSTGRES_DB: dev_grants
+      auth-POSTGRES_DB: dev_ops
     volumes:
-      - auth-grants-data:/var/lib/postgresql/data
+      - auth-ops-data:/var/lib/postgresql/data
 
 volumes:
   auth-identity-data:
   auth-config-data:
-  auth-grants-data:
+  auth-ops-data:

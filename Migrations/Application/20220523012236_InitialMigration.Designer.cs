@@ -9,11 +9,11 @@ using identity_template_example.Data;
 
 #nullable disable
 
-namespace identitytemplateexample.Migrations
+namespace identitytemplateexample.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220522155228_initialMigrationForDockerBase")]
-    partial class initialMigrationForDockerBase
+    [Migration("20220523012236_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
