@@ -19,17 +19,20 @@ public class Index : PageModel
 {
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IPasswordValidator<ApplicationUser> _passwordValidator;
     private readonly ILogger<Index> _logger;
     // private readonly IEmailSender _emailSender;
 
     public Index(
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
-        ILogger<Index> logger)
+        ILogger<Index> logger, 
+        IPasswordValidator<ApplicationUser> passwordValidator)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _logger = logger;
+        _passwordValidator = passwordValidator;
     }
 
     [BindProperty]
@@ -49,7 +52,6 @@ public class Index : PageModel
         public string Email { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
@@ -71,9 +73,19 @@ public class Index : PageModel
     {
         returnUrl ??= Url.Content("~/");
         ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+        
+        var user = new ApplicationUser() { UserName = Input.Email, Email = Input.Email };
+        var passwordValidationResult = await _passwordValidator.ValidateAsync(_userManager, user, Input.Password);
+        if (!passwordValidationResult.Succeeded)
+        {
+            foreach (var identityError in passwordValidationResult.Errors)
+            {
+                ModelState.AddModelError(identityError.Code, identityError.Description);
+            }
+        }
+
         if (ModelState.IsValid)
         {
-            var user = new ApplicationUser() { UserName = Input.Email, Email = Input.Email };
             var result = await _userManager.CreateAsync(user, Input.Password);
             IdentityResult claimResult = null;
             if (result.Succeeded)

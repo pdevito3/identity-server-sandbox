@@ -27,7 +27,7 @@ public static class SeedUsers
                     Email = "AliceSmith@email.com",
                     EmailConfirmed = true,
                 };
-                var result = userMgr.CreateAsync(alice, "Pass123$").Result;
+                var result = userMgr.CreateAsync(alice, "My-long-password40#").Result;
                 if (!result.Succeeded)
                 {
                     throw new Exception(result.Errors.First().Description);
@@ -59,7 +59,7 @@ public static class SeedUsers
                     Email = "BobSmith@email.com",
                     EmailConfirmed = true
                 };
-                var result = userMgr.CreateAsync(bob, "Pass123$").Result;
+                var result = userMgr.CreateAsync(bob, "My-long-password40#").Result;
                 if (!result.Succeeded)
                 {
                     throw new Exception(result.Errors.First().Description);
