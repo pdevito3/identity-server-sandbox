@@ -8,7 +8,7 @@ using Serilog;
 
 namespace identity_template_example;
 
-public class SeedData
+public static class SeedUsers
 {
     public static void EnsureSeedData(WebApplication app)
     {

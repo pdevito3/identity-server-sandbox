@@ -2,6 +2,8 @@
 
 namespace identity_template_example;
 
+using IdentityModel;
+
 public static class Config
 {
     public static IEnumerable<IdentityResource> IdentityResources =>
@@ -29,7 +31,7 @@ public static class Config
                 UserClaims = { "openid", "profile", "role" },
             },
         };
-
+    
     // allow access to identity information. client level rules of who can access what (e.g. read:sample, read:order, create:order, read:report)
     // this will be in the audience claim and will be checked by the jwt middleware to grant access or not
     public static IEnumerable<ApiScope> ApiScopes =>
@@ -41,6 +43,19 @@ public static class Config
     public static IEnumerable<Client> Clients =>
         new Client[]
         {
+        new Client
+            {
+                ClientId = "recipe_management.postman",
+                ClientName = "RecipeManagement Postman",
+                ClientSecrets = { new Secret("974d6f71-d41b-4601-9a7a-a33081f84682".Sha256()) },
+
+                AllowOfflineAccess = true,
+                RequireClientSecret = true,
+                Claims = new List<ClientClaim>() { new(JwtClaimTypes.Role, "SuperAdmin") },
+
+                AllowedGrantTypes = GrantTypes.ClientCredentials,
+                AllowedScopes = { "openid", "profile", "role", "recipe_management" }
+            },
             new Client
             {
                 ClientId = "recipe_management.swagger",
@@ -48,10 +63,10 @@ public static class Config
                 ClientSecrets = { new Secret("974d6f71-d41b-4601-9a7a-a33081f80687".Sha256()) },
 
                 AllowedGrantTypes = GrantTypes.Code,
-                RedirectUris = { "https://localhost:5375/swagger/oauth2-redirect.html" },
-                PostLogoutRedirectUris = { "http://localhost:5375/" },
+                RedirectUris = {"https://localhost:5375/swagger/oauth2-redirect.html"},
+                PostLogoutRedirectUris = {"http://localhost:5375/"},
                 FrontChannelLogoutUri = "http://localhost:5375/signout-oidc",
-                AllowedCorsOrigins = { "https://localhost:5375" },
+                AllowedCorsOrigins = {"https://localhost:5375"},
 
                 AllowOfflineAccess = true,
                 RequirePkce = true,
@@ -66,10 +81,10 @@ public static class Config
                 ClientSecrets = { new Secret("974d6f71-d41b-4601-9a7a-a33081f80687".Sha256()) },
 
                 AllowedGrantTypes = GrantTypes.Code,
-                RedirectUris = { "https://localhost:4378/signin-oidc" },
-                PostLogoutRedirectUris = { "https://localhost:4378/signout-callback-oidc" },
+                RedirectUris = {"https://localhost:4378/signin-oidc"},
+                PostLogoutRedirectUris = {"https://localhost:4378/signout-callback-oidc"},
                 FrontChannelLogoutUri = "https://localhost:4378/signout-oidc",
-                AllowedCorsOrigins = { "https://localhost:5375", "https://localhost:4378" },
+                AllowedCorsOrigins = {"https://localhost:5375", "https://localhost:4378"},
 
                 AllowOfflineAccess = true,
                 RequirePkce = true,

@@ -1,4 +1,5 @@
 ﻿using identity_template_example;
+using is_with_ef;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -24,7 +25,8 @@ try
     // in production you will likely want a different approach.
 
     Log.Information("Seeding database...");
-    SeedData.EnsureSeedData(app);
+    SeedUsers.EnsureSeedData(app);
+    SeedConfig.EnsureSeedData(app);
     Log.Information("Done seeding database. Exiting.");
 
     app.Run();
